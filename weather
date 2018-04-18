@@ -1,0 +1,93 @@
+#!/bin/bash
+
+declare -a Arr
+
+wget -O page https://www.msn.com/en-za/weather/
+
+filename="page"
+exec 10<&0
+exec < $filename
+let count=0
+while read LINE
+do
+	Arr[$count]=$LINE
+	((count++))
+done
+exec 0<&10 10<&-
+
+#let i=0
+#echo ${Arr[0]}
+#while [ $i -le $count ]
+#do
+#	echo ${Arr[$i]}
+#	((i++))
+#done
+ 
+touch atags
+regex="<span class[[:print:]]*</span>"
+for((i=0;i<$count;i++)) ; do
+	if [[ ${Arr[${i}]} =~ $regex ]] ; then
+		echo ${BASH_REMATCH[0]} > atags
+	fi
+done
+
+cont=$(cat atags)
+st=`expr index "$cont" -`
+let st=st+7
+en=`expr index "$cont" .`
+let diff=en-st
+nc=${cont:$st:$diff}
+
+touch atag1
+regex="<li><span>Humidity</span>[[:print:]]*</li>"
+for((i=0;i<$count;i++)) ; do
+        if [[ ${Arr[${i}]} =~ $regex ]] ; then
+                echo ${BASH_REMATCH[0]} > atag1
+        fi
+done
+
+cont1=$(cat atag1)
+st=`expr index "$cont1" y`
+let st=st+8
+en=`expr index "$cont1" %`
+let diff=en-st
+hum=${cont1:$st:$diff}
+
+touch atag2
+regex="<li><span>Visibility</span>[[:print:]]*</li>"
+for((i=0;i<$count;i++)) ; do
+        if [[ ${Arr[${i}]} =~ $regex ]] ; then
+                echo ${BASH_REMATCH[0]} > atag2
+        fi
+done
+
+cont2=$(cat atag2)
+st=`expr index "$cont2" y`
+let st=st+8
+en=`expr index "$cont2" m`
+let diff=en-st
+vis=${cont2:$st:$diff}
+
+touch atag3
+regex="<li><span>Barometer</span>[[:print:]]*</li>"
+for((i=0;i<$count;i++)) ; do
+        if [[ ${Arr[${i}]} =~ $regex ]] ; then
+                echo ${BASH_REMATCH[0]} > atag3
+        fi
+done
+
+cont3=$(cat atag3)
+st=`expr index "$cont3" o`
+let st=st+13
+en=`expr index "$cont3" b`
+let diff=en-st
+press=${cont3:$st:$diff}
+
+clear
+echo "*********Weather Report for Mumbai,Maharashta,India**********"
+echo $nc
+echo "Humidity:$hum"
+echo "Visibility:$vis"
+echo "Pressure:$press(millibars)"
+
+echo "**********_/\_**********"
