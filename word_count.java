@@ -49,8 +49,9 @@ public int run(String[] args) throws Exception {
 }
 
 public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
-    /*
+    
     private final static IntWritable one = new IntWritable(1);
+    /*
     private Text word = new Text();
     */
 
@@ -76,7 +77,9 @@ public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
         int i=Integer.parseInt(map1);
         String map3=arg[2];
         String[] arg2=map3.split("[|]");
-        IntWritable one = new IntWritable(i);
+       /*
+        IntWritable one = new IntWritable(1);
+       */ 
         Text word = new Text();
         for(String a:arg2)
         {
